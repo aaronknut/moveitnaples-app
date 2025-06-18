@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Move It Naples - Inventory Estimator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+  <h1>Move It Naples - Tools</h1>
+
+  <div class="tool-tabs">
+    <button class="tab active" data-tool="inventory-estimator">Inventory Estimator</button>
+    <button class="tab" data-tool="tool-2">Tool 2 (Coming Soon)</button>
+    <button class="tab" data-tool="tool-3">Tool 3 (Coming Soon)</button>
+  </div>
+
+  <div id="tool-inventory-estimator" class="tool-panel active">
+    <h1>Move It Naples - Inventory Estimator</h1>
+
+    <div class="customer-info">
+      <h2>Customer Info</h2>
+      <label>Name: <input type="text" id="customerName" placeholder="Full Name" /></label>
+      <label>Email: <input type="email" id="customerEmail" placeholder="Email Address" /></label>
+      <label>Phone: <input type="tel" id="customerPhone" placeholder="Phone Number" /></label>
+    </div>
+
+    <table id="inventoryTable">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Weight (lbs)</th>
+          <th>Cuft</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="inventoryBody"></tbody>
+    </table>
+
+    <button class="btn" onclick="addRow()">Add Item</button>
+
+    <div class="summary">
+      <h2>Move Details</h2>
+      <label>Crew size: <input type="number" id="crewSize" value="2" min="1" /></label>
+      <label>Flights of stairs: <input type="number" id="flights" value="0" min="0" /></label>
+      <label>Elevator available: <input type="checkbox" id="elevator" /></label>
+      <label>Distance from home to truck (feet): <input type="number" id="distanceToTruck" value="0" /></label>
+      <label>Origin Address: <input type="text" id="originAddress" placeholder="e.g., 123 Main St, Naples, FL" /></label>
+      <div id="waypointsContainer">
+        <label>Additional Stops (optional):</label>
+      </div>
+      <button class="btn" type="button" onclick="addWaypoint()">Add Another Stop</button>
+      <label>Destination Address: <input type="text" id="destinationAddress" placeholder="e.g., 456 Elm St, Fort Myers, FL" /></label>
+      <label>Return to Home Base: <input type="text" id="homeBaseAddress" value="16525 Bonita Landing Circle, Bonita Springs, FL 34135" /></label>
+      <label><button class="btn" onclick="calculateDriveDistance()">Calculate Drive Distance</button></label>
+      <label>OR manually enter driving distance (miles): <input type="number" id="driveMiles" value="0" /></label>
+      <div id="mapPreview" style="width: 100%; height: 300px; margin-top: 16px;"></div>
+    </div>
+
+    <div class="summary">
+      <h2>Estimate Summary</h2>
+      <p>Total Weight: <span id="totalWeight">0</span> lbs</p>
+      <p>Total Volume: <span id="totalCuft">0</span> cuft</p>
+      <p>Truck Recommendation: <span id="truckRecommendation">None</span></p>
+      <p>Estimated Labor Hours (Per Person): <span id="laborHours">0</span></p>
+      <p>Estimated Drive Time (Hours): <span id="driveTime">0</span></p>
+    </div>
+
+    <div class="form-group">
+      <button class="btn" onclick="handleGenerateBillOfLading()">Generate Bill of Lading</button>
+    </div>
+
+    <div id="projectManager" class="summary">
+      <h2>Saved Projects</h2>
+      <ul id="projectList"></ul>
+
+      <h3>Save Current Project</h3>
+      <label>Project Name: <input type="text" id="projectName" placeholder="Enter project name" /></label>
+      <button class="btn" onclick="saveCurrentProject()">Save Project</button>
+    </div>
+  </div>
+
+  <div id="tool-tool-2" class="tool-panel" style="display: none;">
+    <h2>Tool 2 Placeholder</h2>
+    <p>This is where your next tool will go!</p>
+  </div>
+
+  <div id="tool-tool-3" class="tool-panel" style="display: none;">
+    <h2>Tool 3 Placeholder</h2>
+    <p>This tool is under construction.</p>
+  </div>
+
+  <!-- Firebase + Firestore -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBZc_yYBtrg3mOtG4reATQY-H5DT2PzYHs",
+      authDomain: "move-it-naples-tools.firebaseapp.com",
+      projectId: "move-it-naples-tools",
+      storageBucket: "move-it-naples-tools.firebasestorage.app",
+      messagingSenderId: "1009939916646",
+      appId: "1:1009939916646:web:84b2aa7d4bf0a23ff70aa7",
+      measurementId: "G-PXLYP1GNYE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+    window.firebaseDB = db;
+  </script>
+
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTHAvcz69A9GuUdRxoIYgHD-dlfubeNXw&libraries=places&callback=initializeAutocomplete" async defer></script>
+
+  <!-- App Scripts -->
+  <script src="./JavaScript/inventory.js"></script>
+  <script src="./JavaScript/maps.js"></script>
+  <script src="./JavaScript/bol.js"></script>
+  <script src="./JavaScript/projects.js"></script>
+  <script src="./JavaScript/main.js"></script>
+
+  <!-- Tab Binding + Autocomplete Exposure -->
+  <script>
+    function initializeAutocomplete() {
+      const options = {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" }
+      };
+
+      const originInput = document.getElementById("originAddress");
+      const destinationInput = document.getElementById("destinationAddress");
+      const homeBaseInput = document.getElementById("homeBaseAddress");
+
+      if (originInput) new google.maps.places.Autocomplete(originInput, options);
+      if (destinationInput) new google.maps.places.Autocomplete(destinationInput, options);
+      if (homeBaseInput) new google.maps.places.Autocomplete(homeBaseInput, options);
+    }
+    window.initializeAutocomplete = initializeAutocomplete;
+
+    const moveInputs = ['flights', 'elevator', 'distanceToTruck', 'crewSize', 'driveMiles'];
+    moveInputs.forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updateSummary);
+    });
+
+    document.querySelectorAll('.tool-tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tool-tabs .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tool-panel').forEach(panel => panel.classList.remove('active'));
+        const selectedToolId = `tool-${tab.dataset.tool}`;
+        document.getElementById(selectedToolId)?.classList.add('active');
+      });
+    });
+
+    // Expose core functions for inline buttons
+    window.addRow = addRow;
+    window.addWaypoint = addWaypoint;
+    window.calculateDriveDistance = calculateDriveDistance;
+    window.handleGenerateBillOfLading = handleGenerateBillOfLading;
+    window.saveCurrentProject = saveCurrentProject;
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Move It Naples Tools</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .tool-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tool-tabs .tab {
+      padding: 10px 16px;
+      border: none;
+      background-color: #eee;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .tool-tabs .tab.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .tool-panel {
+      display: none;
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Move It Naples Tools</h1>
+
+  <div class="tool-tabs">
+    <button class="tab active" data-tool="inventory">Inventory Estimator</button>
+    <button class="tab" data-tool="crew">Crew Management</button>
+  </div>
+
+  <div id="tool-inventory" class="tool-panel active">
+    <h2>Inventory Estimator</h2>
+    <p>This is where the inventory estimator tool goes.</p>
+  </div>
+
+  <div id="tool-crew" class="tool-panel">
+    <h2>Crew Management</h2>
+    <p>This tool will help assign and track moving crew schedules.</p>
+  </div>
+
+  <script>
+    document.querySelectorAll('.tool-tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove 'active' from all tabs
+        document.querySelectorAll('.tool-tabs .tab').forEach(t => t.classList.remove('active'));
+        // Add 'active' to the clicked tab
+        tab.classList.add('active');
+
+        // Hide all tool panels
+        document.querySelectorAll('.tool-panel').forEach(panel => panel.classList.remove('active'));
+
+        // Show the selected panel
+        const toolId = `tool-${tab.dataset.tool}`;
+        document.getElementById(toolId).classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
